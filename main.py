@@ -1,24 +1,53 @@
 from selenium import webdriver
 import time
-import pandas as pd
-caps = DesiredCapabilities.CHROME
-caps["chromeOptions"] = {}
-caps["chromeOptions"]["excludeSwitches"] = ["disable-popup-blocking"]
 
+#locates chrome driver
 driver = webdriver.Chrome(executable_path= 'D:\Downloads\chromedriver_win32\chromedriver')
 
-search_query = 'https://www.binance.com/en/trade/DOGE_USDT'
+#numb of my dogecoin - DIAMOND HANDS
+DogecoinNumb = 1605.1471
+
+#site with required information
+search_query = 'https://uk.tradingview.com/symbols/DOGEUSDT/'
+
+#what do you think
+driver.get(search_query)
+time.sleep(5)
+#gets sprecific element from page
+Dogecoin_Price_USDT = driver.find_element_by_xpath('//*[@id="anchor-page-1"]/div/div[3]/div[1]/div/div/div/div[1]/div[1]').get_attribute('innerHTML')
+#gets string from site - with certain unnesscery(spelling) stuff
+Dogecoin_Price_USDT = Dogecoin_Price_USDT.replace('<span class="">', '')
+Dogecoin_Price_USDT = Dogecoin_Price_USDT.replace('<span class="tv-symbol-price-quote__value--growing">', '')
+Dogecoin_Price_USDT = Dogecoin_Price_USDT.replace('<span class="tv-symbol-price-quote__value--falling">', '')
+Dogecoin_Price_USDT = Dogecoin_Price_USDT.replace('</span>', '')
+#remove sum bulshite
+Dogecoin_Price_USDT = float(Dogecoin_Price_USDT)
+Dogecoin_Price_USDT *= 100000000
+Dogecoin_Price_USDT = int(Dogecoin_Price_USDT)
+#convert to float then int for calcs
+
+
+#same shit again
+search_query = 'https://uk.tradingview.com/symbols/USDTGBP/'
 
 driver.get(search_query)
 time.sleep(5)
-Dogecoin_Price_USDT = driver.find_element_by_xpath('//*[@id="__APP"]/div/div/div[2]/div[2]/div/div[1]/div[2]/div[1]').get_attribute('innerHTML')
-print(Dogecoin_Price_USDT)
+USDT_Price_GBP = driver.find_element_by_xpath('//*[@id="anchor-page-1"]/div/div[3]/div[1]/div/div/div/div[1]/div[1]').get_attribute('innerHTML')
+USDT_Price_GBP = USDT_Price_GBP.replace('</span>', '')
+USDT_Price_GBP = USDT_Price_GBP.replace('<span>', '')
+USDT_Price_GBP = USDT_Price_GBP.replace('<span class="">', '')
+USDT_Price_GBP = float(USDT_Price_GBP)
+USDT_Price_GBP *= 100000000
+USDT_Price_GBP = int(USDT_Price_GBP)
 
-search_query = 'https://www.binance.com/en/trade/GBP_USDT'
+#calculates
+USDT_Value = (DogecoinNumb*Dogecoin_Price_USDT)/100000000
+GBP_Value = (USDT_Price_GBP*USDT_Value)/100000000
 
-driver.get(search_query)
-time.sleep(5)
-USDT_Price_GBP = driver.find_element_by_xpath('//*[@id="__APP"]/div/div/div[2]/div[2]/div/div[1]/div[2]/div[1]').get_attribute('innerHTML')
-print(USDT_Price_GBP)
+print(f'Your Dogecoin is worth ${round(USDT_Value, 2)} USDT')
+print(f'or £{round(GBP_Value, 2)} GBP')
 
-
+if GBP_Value > 70.07:
+    print(f'You have a profit of {round(GBP_Value - 70.07, 2)} GBP!')
+elif GBP_Value < 70.07:
+    print(f'You have a loss of £{round(70.07 - GBP_Value, 2)} GBP')
